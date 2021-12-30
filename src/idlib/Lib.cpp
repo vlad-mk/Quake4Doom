@@ -1,8 +1,7 @@
 
 
 
-
-#if defined( MACOS_X )
+#if defined( __linux__ ) || defined( MACOS_X )
 #include <signal.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -166,12 +165,12 @@ void UnpackColor( const dword color, idVec4 &unpackedColor ) {
 // jnewquist: Xenon is big endian
 #ifdef _LITTLE_ENDIAN
 	unpackedColor.Set( ( ( color >> 0 ) & 255 ) * ( 1.0f / 255.0f ),
-						( ( color >> 8 ) & 255 ) * ( 1.0f / 255.0f ), 
+						( ( color >> 8 ) & 255 ) * ( 1.0f / 255.0f ),
 						( ( color >> 16 ) & 255 ) * ( 1.0f / 255.0f ),
 						( ( color >> 24 ) & 255 ) * ( 1.0f / 255.0f ) );
 #else
 	unpackedColor.Set( ( ( color >> 24 ) & 255 ) * ( 1.0f / 255.0f ),
-						( ( color >> 16 ) & 255 ) * ( 1.0f / 255.0f ), 
+						( ( color >> 16 ) & 255 ) * ( 1.0f / 255.0f ),
 						( ( color >> 8 ) & 255 ) * ( 1.0f / 255.0f ),
 						( ( color >> 0 ) & 255 ) * ( 1.0f / 255.0f ) );
 #endif
@@ -210,7 +209,7 @@ void UnpackColor( const dword color, idVec3 &unpackedColor ) {
 // jnewquist: Xenon is big endian
 #ifdef _LITTLE_ENDIAN
 	unpackedColor.Set( ( ( color >> 0 ) & 255 ) * ( 1.0f / 255.0f ),
-						( ( color >> 8 ) & 255 ) * ( 1.0f / 255.0f ), 
+						( ( color >> 8 ) & 255 ) * ( 1.0f / 255.0f ),
 						( ( color >> 16 ) & 255 ) * ( 1.0f / 255.0f ) );
 #else
 	unpackedColor.Set( ( ( color >> 16 ) & 255 ) * ( 1.0f / 255.0f ),
@@ -426,8 +425,8 @@ float FloatSwap( float f ) {
 		float	f;
 		byte	b[4];
 	} dat1, dat2;
-	
-	
+
+
 	dat1.f = f;
 	dat2.b[0] = dat1.b[3];
 	dat2.b[1] = dat1.b[2];
@@ -564,7 +563,7 @@ Swap_Init
 void Swap_Init( void ) {
 	byte	swaptest[2] = {1,0};
 
-	// set the byte swapping variables in a portable manner	
+	// set the byte swapping variables in a portable manner
 	if ( *(short *)swaptest == 1) {
 		// little endian ex: x86
 		_BigShort = ShortSwap;
@@ -619,9 +618,7 @@ void AssertFailed( const char *file, int line, const char *expression ) {
 // jnewquist: Visual Studio platform independent breakpoint
 	__debugbreak();
 // RAVEN END
-#elif defined( __linux__ )
-	__asm__ __volatile__ ("int $0x03");
-#elif defined( MACOS_X )
+#elif defined( __linux__ ) || defined( MACOS_X )
 	kill( getpid(), SIGINT );
 #endif
 }

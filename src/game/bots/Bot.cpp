@@ -3,7 +3,7 @@
 
 
 #include "../Game_local.h"
-#include "../weapon.h"
+#include "../Weapon.h"
 
 idCVar bot_pathdebug( "bot_pathdebug", "0", CVAR_BOOL | CVAR_CHEAT, "force the bot to path to player" );
 idCVar bot_goaldist( "bot_goaldist", "20", CVAR_INTEGER | CVAR_CHEAT, "" );
@@ -200,11 +200,11 @@ void rvmBot::BotMoveToGoalOrigin(idVec3 goalOrigin)
 	{
 		idPlayer* enemy = gameLocal.entities[bs.enemy]->Cast<idPlayer>();
 		if( enemy )
-		{			
+		{
 			desiredAngles = (enemy->firstPersonViewOrigin - firstPersonViewOrigin).ToAngles();
-		}		
+		}
 	}
-	
+
 	bs.botinput.viewangles = desiredAngles;
 
 	bs.botinput.speed = pm_speed.GetInteger();
@@ -296,7 +296,7 @@ void rvmBot::ServerThink( void )
 	{
 		aas->WalkPathToGoal(path, curAreaNum, org, goalArea, bs.currentGoal.origin, TFL_WALK | TFL_AIR);
 	}
-	
+
 	idVec3 moveGoal = path.moveGoal;
 	BotMoveToGoalOrigin(path.moveGoal);
 
@@ -318,7 +318,7 @@ void rvmBot::Damage( idEntity* inflictor, idEntity* attacker, const idVec3& dir,
 
 	idPlayer* player = attacker->Cast<idPlayer>();
 	if (health <= 0)
-	{		
+	{
 		if (player)
 		{
 			BotSendChatMessage(DEATH, player->GetNetName());
@@ -412,10 +412,10 @@ void rvmBot::Think( void )
 			color = idVec4(1, 1, 1, 1);
 			if (bs.enemy >= 0)
 				color = idVec4(1, 0, 0, 1);
-		
+
 			idBounds bounds = idBounds( idVec3( -10, -10, -10 ), idVec3( 10, 10, 10 ) );
 			gameRenderWorld->DebugBounds( color, bounds, GetOrigin() );
-		
+
 			//idMat3 axis = viewAngles.ToMat3();
 			//gameRenderWorld->DrawTextA(stateThread.GetState()->state.c_str(), GetOrigin(), 1.0f, color, axis);
 		}

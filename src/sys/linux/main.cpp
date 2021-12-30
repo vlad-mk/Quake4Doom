@@ -2,9 +2,9 @@
 ===========================================================================
 
 Doom 3 GPL Source Code
-Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company. 
+Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company.
 
-This file is part of the Doom 3 GPL Source Code (?Doom 3 Source Code?).  
+This file is part of the Doom 3 GPL Source Code (?Doom 3 Source Code?).
 
 Doom 3 Source Code is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@ If you have questions concerning this license or the applicable additional terms
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/time.h>
 #include <fcntl.h>
 
 #ifdef ID_MCHECK
@@ -69,17 +70,17 @@ void Sys_AsyncThread( void ) {
 	ticked = now >> 4;
 	while (1) {
 		// sleep
-		now = Sys_Milliseconds();		
+		now = Sys_Milliseconds();
 		next = ( now & 0xFFFFFFF0 ) + 0x10;
 		want_sleep = ( next-now-1 ) * 1000;
 		if ( want_sleep > 0 ) {
 			usleep( want_sleep ); // sleep 1ms less than true target
 		}
-		
+
 		// compensate if we slept too long
 		now = Sys_Milliseconds();
 		to_ticked = now >> 4;
-		
+
 		// show ticking statistics - every 100 ticks, print a summary
 		#if 0
 			#define STAT_BUF 100
@@ -100,7 +101,7 @@ void Sys_AsyncThread( void ) {
 				counter = 0;
 			}
 		#endif
-		
+
 		while ( ticked < to_ticked ) {
 			common->Async();
 			ticked++;
@@ -177,8 +178,8 @@ const char *Sys_DefaultBasePath(void) {
 			common->Printf("no '%s' directory in cwd path %s, skipping\n", BASE_GAMEDIR, basepath.c_str());
 		}
 	}
-	common->Printf( "WARNING: using hardcoded default base path\n" );
-	return LINUX_DEFAULT_PATH;
+	common->Printf( "WARNING: using savepath path\n" );
+	return savepath.c_str();
 }
 
 /*
@@ -256,9 +257,20 @@ double Sys_GetClockTicks( void ) {
 						  "pop %%ebx\n"
 						  : "=r" (lo), "=r" (hi) );
 	return (double) lo + (double) 0xFFFFFFFF * hi;
+// RB begin
+#elif defined( __x86_64__ )
+        uint32_t lo, hi;
+        __asm__ __volatile__( "rdtsc" : "=a"( lo ), "=d"( hi ) );
+        return ( ( ( uint64_t )hi ) << 32 ) | lo;
 #else
-#error unsupported CPU
+        //#error unsupported CPU
+        struct timespec now;
+
+        clock_gettime( CLOCK_MONOTONIC, &now );
+
+        return now.tv_sec * 1000000000LL + now.tv_nsec;
 #endif
+// RB end
 }
 
 /*
@@ -271,7 +283,7 @@ double MeasureClockTicks( void ) {
 
 	t0 = Sys_GetClockTicks( );
 	Sys_Sleep( 1000 );
-	t1 = Sys_GetClockTicks( );	
+	t1 = Sys_GetClockTicks( );
 	return t1 - t0;
 }
 
@@ -297,7 +309,7 @@ double Sys_ClockTicksPerSecond(void) {
 		ret = MeasureClockTicks();
 		init = true;
 		common->Printf( "measured CPU frequency: %g MHz\n", ret / 1000000.0 );
-		return ret;		
+		return ret;
 	}
 	len = read( fd, buf, 4096 );
 	close( fd );
@@ -314,7 +326,7 @@ double Sys_ClockTicksPerSecond(void) {
 				ret = MeasureClockTicks();
 				init = true;
 				common->Printf( "measured CPU frequency: %g MHz\n", ret / 1000000.0 );
-				return ret;		
+				return ret;
 			}
 			common->Printf( "/proc/cpuinfo CPU frequency: %g MHz\n", ret );
 			ret *= 1000000;
@@ -327,7 +339,7 @@ double Sys_ClockTicksPerSecond(void) {
 	ret = MeasureClockTicks();
 	init = true;
 	common->Printf( "measured CPU frequency: %g MHz\n", ret / 1000000.0 );
-	return ret;		
+	return ret;
 }
 
 /*
@@ -344,7 +356,7 @@ int Sys_GetSystemRam( void ) {
 	if ( count == -1 ) {
 		common->Printf( "GetSystemRam: sysconf _SC_PHYS_PAGES failed\n" );
 		return 512;
-	}	
+	}
 	page_size = sysconf( _SC_PAGE_SIZE );
 	if ( page_size == -1 ) {
 		common->Printf( "GetSystemRam: sysconf _SC_PAGE_SIZE failed\n" );
@@ -365,7 +377,7 @@ the no-fork lets you keep the terminal when you're about to spawn an installer
 if the command contains spaces, system() is used. Otherwise the more straightforward execl ( system() blows though )
 ==================
 */
-void Sys_DoStartProcess( const char *exeName, bool dofork ) {	
+void Sys_DoStartProcess( const char *exeName, bool dofork ) {
 	bool use_system = false;
 	if ( strchr( exeName, ' ' ) ) {
 		use_system = true;
@@ -431,7 +443,7 @@ void idSysLocal::OpenURL( const char *url, bool quit ) {
 	}
 
 	common->Printf( "Open URL: %s\n", url );
-	// opening an URL on *nix can mean a lot of things .. 
+	// opening an URL on *nix can mean a lot of things ..
 	// just spawn a script instead of deciding for the user :-)
 
 	// look in the savepath first, then in the basepath
@@ -548,7 +560,7 @@ int main(int argc, const char **argv) {
 	mcheck( abrt_func );
 	Sys_Printf( "memory consistency checking enabled\n" );
 #endif
-	
+
 	Posix_EarlyInit( );
 
 	if ( argc > 1 ) {

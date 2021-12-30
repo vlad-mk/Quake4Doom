@@ -1500,6 +1500,15 @@ void idSysLocal::OpenURL(const char* url, bool doexit) {
 	}
 }
 
+
+/*
+==================
+idSysLocal::StartProcess
+==================
+*/
+void idSysLocal::StartProcess( const char *exeName, bool quit ) {
+}
+
 /*
 ==================
 Sys_SetFatalError

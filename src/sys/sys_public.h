@@ -2,9 +2,9 @@
 ===========================================================================
 
 Doom 3 GPL Source Code
-Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company. 
+Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company.
 
-This file is part of the Doom 3 GPL Source Code (?Doom 3 Source Code?).  
+This file is part of the Doom 3 GPL Source Code (?Doom 3 Source Code?).
 
 Doom 3 Source Code is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -113,10 +113,15 @@ If you have questions concerning this license or the applicable additional terms
 	#define	BUILD_STRING				"linux-ppc"
 	#define CPUSTRING					"ppc"
 	#define CPU_EASYARGS				0
+#elif defined(__aarch64__)
+	#define	BUILD_STRING				"linux-aarch64"
+	#define BUILD_OS_ID					2
+	#define CPUSTRING					"aarch64"
+	#define CPU_EASYARGS				0
 #endif
 
 #define _alloca							alloca
-#define _alloca16( x )					((void *)((((int)alloca( (x)+15 )) + 15) & ~15))
+#define _alloca16( x )					((void *)((((uintptr_t)_alloca( (x)+15 )) + 15) & ~15))
 
 #define ALIGN16( x )					x
 #define PACKED							__attribute__((packed))
@@ -128,6 +133,7 @@ If you have questions concerning this license or the applicable additional terms
 #define ASSERT							assert
 
 #define ID_INLINE						inline
+#define ID_INLINE_EXTERN                extern inline
 #define ID_STATIC_TEMPLATE
 
 #define assertmem( x, y )
@@ -137,7 +143,7 @@ If you have questions concerning this license or the applicable additional terms
 #ifdef __GNUC__
 #define id_attribute(x) __attribute__(x)
 #else
-#define id_attribute(x)  
+#define id_attribute(x)
 #endif
 
 typedef enum {
@@ -336,7 +342,7 @@ void			Sys_GenerateEvents( void );
 sysEvent_t		Sys_GetEvent( void );
 void			Sys_ClearEvents( void );
 
-// input is tied to windows, so it needs to be started up and shut down whenever 
+// input is tied to windows, so it needs to be started up and shut down whenever
 // the main window is recreated
 void			Sys_InitInput( void );
 void			Sys_ShutdownInput( void );
@@ -505,7 +511,7 @@ void				Sys_DestroyThread( xthreadInfo& info ); // sets threadHandle back to 0
 // find the name of the calling thread
 // if index != NULL, set the index in g_threads array (use -1 for "main" thread)
 const char *		Sys_GetThreadName( int *index = 0 );
- 
+
 const int MAX_CRITICAL_SECTIONS		= 4;
 
 enum {

@@ -301,7 +301,11 @@ void rvBSE::LoopInstant(float time)
 	bool v4; // zf
 	bool v5; // sf
 	int v6; // ebx
+#ifdef __linux__
+	uint64_t v7; // st7
+#else // __linux__
 	unsigned __int64 v7; // st7
+#endif // __linux__
 
 	v2 = this;
 	if (0.0 == this->mDuration)

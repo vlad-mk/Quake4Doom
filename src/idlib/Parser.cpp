@@ -609,7 +609,7 @@ void idParser::AddBuiltinDefines( void ) {
 		char *string;
 		int id;
 	} builtin[] = {
-		{ "__LINE__",	BUILTIN_LINE }, 
+		{ "__LINE__",	BUILTIN_LINE },
 		{ "__FILE__",	BUILTIN_FILE },
 		{ "__DATE__",	BUILTIN_DATE },
 		{ "__TIME__",	BUILTIN_TIME },
@@ -693,9 +693,9 @@ int idParser::ExpandBuiltinDefine( idToken *deftoken, define_t *define, idToken 
 			curtime = ctime(&t);
 			(*token) = "\"";
 			token->Append( curtime+4 );
-			token[7] = '\0';
+			token[7] = NULL;
 			token->Append( curtime+20 );
-			token[10] = '\0';
+			token[10] = NULL;
 			token->Append( "\"" );
 			free(curtime);
 			token->type = TT_STRING;
@@ -712,7 +712,7 @@ int idParser::ExpandBuiltinDefine( idToken *deftoken, define_t *define, idToken 
 			curtime = ctime(&t);
 			(*token) = "\"";
 			token->Append( curtime+11 );
-			token[8] = '\0';
+			token[8] = NULL;
 			token->Append( "\"" );
 			free(curtime);
 			token->type = TT_STRING;
@@ -822,7 +822,7 @@ int idParser::ExpandDefine( idToken *deftoken, define_t *define, idToken **first
 			// add the token to the list
 			t->next = NULL;
 // the token being read from the define list should use the line number of
-// the original file, not the header file			
+// the original file, not the header file
 			t->line = deftoken->line;
 
 			if ( last ) last->next = t;
@@ -902,7 +902,7 @@ int idParser::ReadLine( idToken *token ) {
 		if (!idParser::ReadSourceToken( token )) {
 			return false;
 		}
-		
+
 		if (token->linesCrossed > crossline) {
 			idParser::UnreadSourceToken( token );
 			return false;
@@ -1517,7 +1517,7 @@ int idParser::EvaluateTokens( idToken *tokens, signed long int *intvalue, double
 							break;
 						}
 					}
-					
+
 					case P_MUL:
 					case P_DIV:
 					case P_MOD:
@@ -2893,19 +2893,19 @@ void idParser::GetStringFromMarker( idStr& out, bool clean ) {
 	if ( marker_p == NULL ) {
 		marker_p = scriptstack->buffer;
 	}
-		
+
 	if ( tokens ) {
 		p = (char*)tokens->whiteSpaceStart_p;
 	} else {
 		p = (char*)scriptstack->script_p;
 	}
-	
+
 	// Set the end character to NULL to give us a complete string
 	save = *p;
 	*p = 0;
-	
+
 	// If cleaning then reparse
-	if ( clean ) {	
+	if ( clean ) {
 		idParser temp( marker_p, strlen( marker_p ), "temp", flags );
 		idToken token;
 		while ( temp.ReadToken ( &token ) ) {
@@ -2914,9 +2914,9 @@ void idParser::GetStringFromMarker( idStr& out, bool clean ) {
 	} else {
 		out = marker_p;
 	}
-	
+
 	// restore the character we set to NULL
-	*p = save;		
+	*p = save;
 }
 
 /*
@@ -3153,7 +3153,7 @@ idParser::idParser() {
 	this->marker_p = NULL;
 
 // RAVEN BEGIN
-// bdube: added members	
+// bdube: added members
 	marker_p = NULL;
 // RAVEN END
 }
@@ -3176,7 +3176,7 @@ idParser::idParser( int flags ) {
 	this->marker_p = NULL;
 
 // RAVEN BEGIN
-// bdube: added members	
+// bdube: added members
 	marker_p = NULL;
 // RAVEN END
 }

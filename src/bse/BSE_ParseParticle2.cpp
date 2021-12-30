@@ -8,6 +8,14 @@
 #include "BSE.h"
 #include "BSE_SpawnDomains.h"
 
+
+#ifdef __linux__
+#define __int16 int16_t
+#define __int8 int8_t
+#define LOWORD(l)       ((uint16_t)(((uint32_t)(l)) & 0xffff))
+#endif
+
+
 rvTrailInfo rvParticleTemplate::sTrailInfo;
 rvElectricityInfo rvParticleTemplate::sElectricityInfo;
 rvEnvParms rvParticleTemplate::sDefaultEnvelope;
@@ -26,7 +34,7 @@ void rvParticleTemplate::AllocTrail()
 {
 	if (mTrailInfo != NULL) {
 		mTrailInfo = new rvTrailInfo();
-	}	
+	}
 }
 
 bool rvParticleTemplate::ParseBlendParms(rvDeclEffect* effect, idParser* src)
@@ -97,7 +105,7 @@ bool rvParticleTemplate::ParseImpact(rvDeclEffect* effect, idParser* src)
 	if (!src->ReadToken(&token))
 	{
 	LABEL_30:
-		v16 = -1;	
+		v16 = -1;
 		return 0;
 	}
 	while (idStr::Cmp(token, "}"))
@@ -790,8 +798,8 @@ bool rvParticleTemplate::CheckCommonParms(idParser* src, rvParticleParms& parms)
 
 rvParticleParms* rvParticleTemplate::ParseSpawnParms(rvDeclEffect* effect, idParser* src, int count, rvParticleParms* def) {
 	idToken token;
-	rvParticleParms* v7; 
-	rvParticleParms* v8; 
+	rvParticleParms* v7;
+	rvParticleParms* v8;
 
 	if (!src->ExpectTokenString("{")) {
 		return def;
@@ -1060,7 +1068,7 @@ bool rvParticleTemplate::ParseDeathDomains(rvDeclEffect* effect, idParser* src) 
 bool rvParticleTemplate::Parse(rvDeclEffect* effect, idParser* src) {
 	idToken token;
 
-	src->ExpectTokenString("{");	
+	src->ExpectTokenString("{");
 	while (true) {
 		src->ReadToken(&token);
 
@@ -1442,7 +1450,7 @@ void rvParticleTemplate::InitStatic()
 		rvParticleTemplate::sElectricityInfo.mJitterRate = 0.0;
 		//v2 = sdSingleton<sdDeclTypeHolder>::GetInstance();
 		rvParticleTemplate::sElectricityInfo.mJitterTable = declManager->FindTable("halfsintable", false);
-		rvParticleTemplate::sDefaultEnvelope.Init(); //rvEnvParms::Init(&rvParticleTemplate::sDefaultEnvelope);		
+		rvParticleTemplate::sDefaultEnvelope.Init(); //rvEnvParms::Init(&rvParticleTemplate::sDefaultEnvelope);
 		rvParticleTemplate::sDefaultEnvelope.SetDefaultType(); // rvEnvParms::SetDefaultType(&rvParticleTemplate::sDefaultEnvelope);
 		rvParticleTemplate::sDefaultEnvelope.mStatic = 1;
 		rvParticleTemplate::sEmptyEnvelope.Init(); // rvEnvParms::Init(&rvParticleTemplate::sEmptyEnvelope);

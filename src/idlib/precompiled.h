@@ -97,7 +97,7 @@ class ThreadedAlloc;		// class that is only used to expand the AutoCrit template
 	// Enables the batching of vertex cache request in SMP mode.
 	// Note (TTimo): is tied to ENABLE_INTEL_SMP
 	#define ENABLE_INTEL_VERTEXCACHE_OPT
-	
+
 	// Empty define for Xbox 360 compatibility
 	#define RESTRICT
 	#define TIME_THIS_SCOPE(x)
@@ -125,6 +125,50 @@ class ThreadedAlloc;		// class that is only used to expand the AutoCrit template
 	};
 
 #endif // _WINDOWS
+
+#ifdef __linux__
+
+// for offsetof
+#include <stddef.h>
+// FLT_MAX and such
+#include <limits.h>
+#include <float.h>
+
+        #define __WITH_PB__
+        #undef WIN32
+        #undef _XBOX
+        #undef _CONSOLE
+        #define _OPENGL
+        #define _LITTLE_ENDIAN
+        #define _CASE_SENSITIVE_FILESYSTEM
+
+        #define NEWLINE                         "\n"
+
+        #define _GLVAS_SUPPPORT
+
+        class AlignmentChecker
+        {
+        public:
+                static void UpdateCount(void const * const ptr) {}
+                static void ClearCount() {}
+                static void Print() {}
+        };
+
+        #define RESTRICT
+        #define TIME_THIS_SCOPE(x)
+
+        // we release both a non-SMP and an SMP binary for Linux
+        #ifdef ENABLE_INTEL_SMP
+        // Enables the batching of vertex cache request in SMP mode.
+        // Note (TTimo): is tied to ENABLE_INTEL_SMP
+        #define ENABLE_INTEL_VERTEXCACHE_OPT
+        #endif
+
+        #define __thiscall
+
+        #define ID_GL_HARDLINK
+#endif
+
 
 #ifndef BIT
 #define BIT( num )				BITT< num >::VALUE
@@ -241,9 +285,9 @@ public:
 // RAVEN BEGIN
 // jscott: new decl types
 #include "../framework/DeclPlayerModel.h"
-#include "../framework/declMatType.h"
-#include "../framework/declLipSync.h"
-#include "../framework/declPlayback.h"
+#include "../framework/DeclMatType.h"
+#include "../framework/DeclLipSync.h"
+#include "../framework/DeclPlayback.h"
 // RAVEN END
 
 // We have expression parsing and evaluation code in multiple places:
@@ -256,6 +300,7 @@ const float MAX_BOUND_SIZE = 65536.0f;
 
 // renderer
 #include "../renderer/qgl.h"
+
 #include "../renderer/Cinematic.h"
 #include "../renderer/Material.h"
 #include "../renderer/Model.h"

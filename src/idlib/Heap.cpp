@@ -30,7 +30,7 @@ void Memory::Error(const char *errStr)
 	{
 		// if common isn't initialized then we set a flag so that we can notify once it
 		// gets initialized
-		sOK = false;	
+		sOK = false;
 	}
 }
 #endif
@@ -125,7 +125,7 @@ int PeakXMallocTagSize[MA_MAX];
 int CurrNumAllocations[MA_MAX];
 
 
-// Descriptions that go with each tag.  When updating the tag enum in Heap.h please 
+// Descriptions that go with each tag.  When updating the tag enum in Heap.h please
 // update this list as well.
 // (also update the list in rvHeap.cpp)
 char *TagNames[] = {
@@ -176,14 +176,14 @@ class TagTableCheck<1>
 {
 };
 
-// An error here means you need to synchronize TagNames and Mem_Alloc_Types_t 
+// An error here means you need to synchronize TagNames and Mem_Alloc_Types_t
 TagTableCheck<sizeof(TagNames)/sizeof(char*) == MA_MAX> TagTableCheckedHere;
-// An error here means there are too many tags.  No more than 32! 
+// An error here means there are too many tags.  No more than 32!
 TagTableCheck<MA_DO_NOT_USE<32> TagMaxCheckedHere;
 
 void PrintOutstandingMemAlloc()
 {
-	
+
 	int i;
 	unsigned long totalOutstanding = 0;
 	for (i=0;i<MA_MAX;i++)
@@ -195,7 +195,7 @@ void PrintOutstandingMemAlloc()
 		}
 	}
 	idLib::common->Printf("Mem_Alloc Outstanding: %d\n",totalOutstanding);
-	
+
 }
 
 const char *GetMemAllocStats(int tag, int &num, int &size, int &peak)
@@ -393,7 +393,7 @@ idHeap::~idHeap( void ) {
 	if ( smallCurPage ) {
 		FreePage( smallCurPage );			// free small-heap current allocation page
 	}
-	p = smallFirstUsedPage;					// free small-heap allocated pages 
+	p = smallFirstUsedPage;					// free small-heap allocated pages
 	while( p ) {
 		idHeap::page_s *next = p->next;
 		FreePage( p );
@@ -421,7 +421,7 @@ idHeap::~idHeap( void ) {
 		p = next;
 	}
 
-	ReleaseSwappedPages();			
+	ReleaseSwappedPages();
 
 	if ( defragBlock ) {
 // RAVEN BEGIN
@@ -481,7 +481,7 @@ return local_malloc( bytes);
 
 //RAVEN END
 
-	
+
 #else
 //RAVEN BEGIN
 //amccarthy:  Added allocation tag
@@ -492,7 +492,7 @@ return local_malloc( bytes);
 		return MediumAllocate( bytes, tag );
 	}
 	return LargeAllocate( bytes, tag );
-	
+
 //RAVEN END
 #endif
 }
@@ -532,7 +532,7 @@ void idHeap::Free( void *p ) {
 			break;
 		}
 	}
-	
+
 #endif
 }
 
@@ -578,7 +578,7 @@ void *idHeap::Allocate16( const dword bytes, byte tag ) {
 			defragBlock = NULL;
 // RAVEN BEGIN
 // jnewquist: send all allocations through one place on the Xenon
-			ptr = (byte *) local_malloc( bytes + 16 + 4 );			
+			ptr = (byte *) local_malloc( bytes + 16 + 4 );
 // RAVEN END
 			AllocDefragBlock();
 		}
@@ -587,12 +587,12 @@ void *idHeap::Allocate16( const dword bytes, byte tag ) {
 		}
 	}
 
-	alignedPtr = (byte *) ( ( (int) ptr ) + 15 & ~15 );
+	alignedPtr = (byte *) ( ( (uintptr_t) ptr ) + 15 & ~15 );
   	if ( alignedPtr - ptr < 4 ) {
    		alignedPtr += 16;
 
    	}
-  	*((int *)(alignedPtr - 4)) = (int) ptr;
+  	*((int *)(alignedPtr - 4)) = (uintptr_t) ptr;
    	assert( ( unsigned int )alignedPtr < 0xff000000 );
    	return (void *) alignedPtr;
 
@@ -706,7 +706,7 @@ void idHeap::Dump( void ) {
 	for ( pg = mediumFirstFreePage; pg; pg = pg->next ) {
 		idLib::common->Printf( "%p  bytes %-8d  (partially used by medium heap)\n", pg->data, pg->dataSize );
 	}
-	
+
 	for ( pg = largeFirstUsedPage; pg; pg = pg->next ) {
 		idLib::common->Printf( "%p  bytes %-8d  (fully used by large heap)\n", pg->data, pg->dataSize );
 	}
@@ -781,7 +781,7 @@ idHeap::page_s* idHeap::AllocatePage( dword bytes ) {
 				defragBlock = NULL;
 // RAVEN BEGIN
 // jnewquist: send all allocations through one place on the Xenon
-				p = (idHeap::page_s *) ::local_malloc( size + ALIGN - 1 );			
+				p = (idHeap::page_s *) ::local_malloc( size + ALIGN - 1 );
 // RAVEN END
 				AllocDefragBlock();
 			}
@@ -790,7 +790,7 @@ idHeap::page_s* idHeap::AllocatePage( dword bytes ) {
 			}
 		}
 
-		p->data		= (void *) ALIGN_SIZE( (int)((byte *)(p)) + sizeof( idHeap::page_s ) );
+		p->data		= (void *) ALIGN_SIZE( (uintptr_t)((byte *)(p)) + sizeof( idHeap::page_s ) );
 		p->dataSize	= size - sizeof(idHeap::page_s);
 		p->firstFree = NULL;
 		p->largestFree = 0;
@@ -801,7 +801,7 @@ idHeap::page_s* idHeap::AllocatePage( dword bytes ) {
 	p->next = NULL;
 
 	pagesAllocated++;
-	
+
 	return p;
 }
 
@@ -871,10 +871,10 @@ void *idHeap::SmallAllocate( dword bytes, byte tag ) {
 		smallBlock[2] = SMALL_ALLOC;		// allocation identifier
 
 #else
-		
+
 		smallBlock[1] = SMALL_ALLOC;		// allocation identifier
 #endif
-		
+
 //RAVEN END
 		smallFirstFree[bytes / ALIGN] = (void *)(*link);
 		return (void *)(link);
@@ -911,7 +911,7 @@ void *idHeap::SmallAllocate( dword bytes, byte tag ) {
 		smallBlock[2] = SMALL_ALLOC;		// allocation identifier
 
 #else
-		
+
 		smallBlock[1] = SMALL_ALLOC;		// allocation identifier
 #endif
 //RAVEN END
@@ -943,7 +943,7 @@ void idHeap::SmallFree( void *ptr ) {
 //RAVEN END
 
 	byte *d = ( (byte *)ptr ) - SMALL_HEADER_SIZE;
-	dword *dt = (dword *)ptr;
+	uintptr_t *dt = (uintptr_t *)ptr;
 	// index into the table with free small memory blocks
 	dword ix = *d;
 
@@ -952,7 +952,7 @@ void idHeap::SmallFree( void *ptr ) {
 		idLib::common->FatalError( "SmallFree: invalid memory block" );
 	}
 
-	*dt = (dword)smallFirstFree[ix];	// write next index
+	*dt = (uintptr_t)smallFirstFree[ix];	// write next index
 	smallFirstFree[ix] = (void *)d;		// link
 }
 
@@ -1004,7 +1004,7 @@ void *idHeap::MediumAllocateFromPage( idHeap::page_s *p, dword sizeNeeded, byte 
 		}
 		best->next	= nw;
 		best->size	-= sizeNeeded;
-		
+
 		p->largestFree = best->size;
 	}
 	else {
@@ -1086,7 +1086,7 @@ void *idHeap::MediumAllocate( dword bytes, byte tag ) {
 		}
 
 		mediumFirstFreePage		= p;
-		
+
 		p->largestFree	= pageSize;
 		p->firstFree	= (void *)p->data;
 
@@ -1136,7 +1136,7 @@ void *idHeap::MediumAllocate( dword bytes, byte tag ) {
 		}
 		mediumFirstUsedPage = p;
 		return data;
-	} 
+	}
 
 	// re-order linked list (so that next malloc query starts from current
 	// matching block) -- this speeds up both the page walks and block walks
@@ -1212,18 +1212,18 @@ void idHeap::MediumFree( void *ptr ) {
 		p->largestFree	= e->size;
 		e->freeBlock	= 1;				// mark block as free
 	}
-			
+
 	mediumHeapEntry_s *next = e->next;
 
 	// if the next block is free we can merge
 	if ( next && next->freeBlock ) {
 		e->size += next->size;
 		e->next = next->next;
-		
+
 		if ( next->next ) {
 			next->next->prev = e;
 		}
-		
+
 		if ( next->prevFree ) {
 			next->prevFree->nextFree = next->nextFree;
 		}
@@ -1256,7 +1256,7 @@ void idHeap::MediumFree( void *ptr ) {
 		if ( e->nextFree ) {
 			e->nextFree->prevFree = e->prevFree;
 		}
-		
+
 		e->nextFree = (mediumHeapEntry_s *)p->firstFree;
 		e->prevFree = NULL;
 		if ( e->nextFree ) {
@@ -1289,7 +1289,7 @@ void idHeap::MediumFree( void *ptr ) {
 		if ( !mediumFirstFreePage ) {
 			mediumFirstFreePage = p;
 		}
-	} 
+	}
 }
 
 //===============================================================
@@ -1320,8 +1320,8 @@ void *idHeap::LargeAllocate( dword bytes, byte tag ) {
 	}
 
 	byte *	d	= (byte*)(p->data) + ALIGN_SIZE( LARGE_HEADER_SIZE );
-	dword *	dw	= (dword*)(d - ALIGN_SIZE( LARGE_HEADER_SIZE ));
-	dw[0]		= (dword)p;				// write pointer back to page table
+	uintptr_t *	dw	= (uintptr_t*)(d - ALIGN_SIZE( LARGE_HEADER_SIZE ));
+	dw[0]		= (uintptr_t)p;				// write pointer back to page table
 //RAVEN BEGIN
 //amccarthy:  Added allocation tag
 #ifdef _DEBUG
@@ -1939,7 +1939,7 @@ void Mem_DumpCompressed( const char *fileName, memorySortType_t memSort, int sor
 	}
 
 // RAVEN BEGIN
-// dluetscher: changed xenon version to output anything above 1K to the console 
+// dluetscher: changed xenon version to output anything above 1K to the console
 #ifdef _XENON
 	// write list to debug output and console
 	for ( a = sortedAllocInfo; a; a = nexta ) {
@@ -2230,7 +2230,7 @@ Mem_CopyString
 */
 char *Mem_CopyString( const char *in, const char *fileName, const int lineNumber ) {
 	char	*out;
-	
+
 	out = (char *)Mem_Alloc( strlen(in) + 1, fileName, lineNumber );
 	strcpy( out, in );
 	return out;

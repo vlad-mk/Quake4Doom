@@ -212,7 +212,7 @@ public:
 // RAVEN BEGIN
 // bdube: escapes
 	int					IsEscape( int* type = NULL ) const;
-	int					LengthWithoutEscapes ( void ) const;	
+	int					LengthWithoutEscapes ( void ) const;
 	idStr &				RemoveEscapes ( int escapes = S_ESCAPE_ALL );
 // RAVEN END
 	void				CapLength( int );
@@ -246,6 +246,7 @@ public:
 // RAVEN END
 
 	bool				IsColor(void) const;
+    ID_INLINE void          CopyRange( const char* text, int start, int end );
 
 	// file name methods
 	int					FileNameHash( void ) const;						// hash key for the filename (skips extension)
@@ -299,7 +300,7 @@ public:
 // RAVEN BEGIN
 // bdube: escape codes
 	static int			IsEscape( const char *s, int* type = NULL );
-	static int			LengthWithoutEscapes( const char *s );	
+	static int			LengthWithoutEscapes( const char *s );
 	static char *		RemoveEscapes( char *s, int escapes = S_ESCAPE_ALL );
 // RAVEN END
 	static int			Cmp( const char *s1, const char *s2 );
@@ -1140,4 +1141,27 @@ ID_INLINE int idStr::DynamicMemoryUsed() const {
 	return ( data == baseBuffer ) ? 0 : alloced;
 }
 
+/*
+========================
+idStr::CopyRange
+========================
+*/
+ID_INLINE void idStr::CopyRange( const char* text, int start, int end )
+{
+        int l = end - start;
+        if( l < 0 )
+        {
+                l = 0;
+        }
+
+        EnsureAlloced( l + 1 );
+
+        for( int i = 0; i < l; i++ )
+        {
+                data[ i ] = text[ start + i ];
+        }
+
+        data[ l ] = '\0';
+        len = l;
+}
 #endif /* !__STR_H__ */
