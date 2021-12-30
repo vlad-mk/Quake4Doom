@@ -550,7 +550,7 @@ void idGameLocal::Init( void ) {
 // jmarshall
 	InitGameRenderSystem();
 // jmarshall end
-/*
+/* TODO: uncomment bots later
 // jmarshall
 	//
 	// load in the bot itemtable.
