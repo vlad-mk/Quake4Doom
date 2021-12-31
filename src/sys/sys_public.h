@@ -113,10 +113,15 @@ If you have questions concerning this license or the applicable additional terms
 	#define	BUILD_STRING				"linux-ppc"
 	#define CPUSTRING					"ppc"
 	#define CPU_EASYARGS				0
+#elif defined(__aarch64__)
+	#define	BUILD_STRING				"linux-aarch64"
+	#define BUILD_OS_ID					2
+	#define CPUSTRING					"aarch64"
+	#define CPU_EASYARGS				0
 #endif
 
 #define _alloca							alloca
-#define _alloca16( x )					((void *)((((int)alloca( (x)+15 )) + 15) & ~15))
+#define _alloca16( x )					((void *)((((uintptr_t)_alloca( (x)+15 )) + 15) & ~15))
 
 #define ALIGN16( x )					x
 #define PACKED							__attribute__((packed))
@@ -128,6 +133,7 @@ If you have questions concerning this license or the applicable additional terms
 #define ASSERT							assert
 
 #define ID_INLINE						inline
+#define ID_INLINE_EXTERN                extern inline
 #define ID_STATIC_TEMPLATE
 
 #define assertmem( x, y )

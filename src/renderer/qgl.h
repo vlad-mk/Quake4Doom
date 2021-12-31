@@ -7,8 +7,38 @@
 #ifndef __QGL_H__
 #define __QGL_H__
 
-#include "../external/glew/glew.h"
+#if defined( _WINDOWS )
 
+#include <gl/gl.h>
+
+#elif defined( __linux__ )
+
+// using our local glext.h
+// http://oss.sgi.com/projects/ogl-sample/ABI/
+#define GL_GLEXT_LEGACY
+#define GLX_GLXEXT_LEGACY
+#include <GL/glew.h>
+#include <GL/gl.h>
+#include <GL/glx.h>
+
+// TTimo - X.h has a '#define Success 0' line..
+#undef Success
+
+#else
+
+#include <gl.h>
+
+#endif
+
+// non-windows systems will just redefine qgl* to gl*
+#if defined( __linux__ ) || defined( ID_GL_HARDLINK )
+
+#include "qgl_linked.h"
+
+#endif
+
+
+#if defined( _WINDOWS )
 // RAVEN BEGIN
 // dluetscher: added some wgl calls to the XENON version, as well as the Windows version
 typedef struct tagPIXELFORMATDESCRIPTOR PIXELFORMATDESCRIPTOR, *PPIXELFORMATDESCRIPTOR, FAR *LPPIXELFORMATDESCRIPTOR;
@@ -56,5 +86,7 @@ extern int  ( WINAPI * qwglGetLayerPaletteEntries)(HDC, int, int, int,
                                                 COLORREF * RESTRICT );
 extern BOOL ( WINAPI * qwglRealizeLayerPalette)(HDC, int, BOOL);
 extern BOOL ( WINAPI * qwglSwapLayerBuffers)(HDC, UINT);
+
+#endif // defined( _WINDOWS )
 
 #endif

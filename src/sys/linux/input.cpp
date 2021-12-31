@@ -217,7 +217,6 @@ void Sys_XUninstallGrabs(void) {
 }
 
 void Sys_GrabMouseCursor( bool grabIt ) {
-
 #if defined( ID_DEDICATED )
 	return;
 #endif

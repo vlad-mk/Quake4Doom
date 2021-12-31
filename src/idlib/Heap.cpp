@@ -587,12 +587,12 @@ void *idHeap::Allocate16( const dword bytes, byte tag ) {
 		}
 	}
 
-	alignedPtr = (byte *) ( ( (int) ptr ) + 15 & ~15 );
+	alignedPtr = (byte *) ( ( (uintptr_t) ptr ) + 15 & ~15 );
   	if ( alignedPtr - ptr < 4 ) {
    		alignedPtr += 16;
 
    	}
-  	*((int *)(alignedPtr - 4)) = (int) ptr;
+  	*((int *)(alignedPtr - 4)) = (uintptr_t) ptr;
    	assert( ( unsigned int )alignedPtr < 0xff000000 );
    	return (void *) alignedPtr;
 
@@ -790,7 +790,7 @@ idHeap::page_s* idHeap::AllocatePage( dword bytes ) {
 			}
 		}
 
-		p->data		= (void *) ALIGN_SIZE( (int)((byte *)(p)) + sizeof( idHeap::page_s ) );
+		p->data		= (void *) ALIGN_SIZE( (uintptr_t)((byte *)(p)) + sizeof( idHeap::page_s ) );
 		p->dataSize	= size - sizeof(idHeap::page_s);
 		p->firstFree = NULL;
 		p->largestFree = 0;
@@ -943,7 +943,7 @@ void idHeap::SmallFree( void *ptr ) {
 //RAVEN END
 
 	byte *d = ( (byte *)ptr ) - SMALL_HEADER_SIZE;
-	dword *dt = (dword *)ptr;
+	uintptr_t *dt = (uintptr_t *)ptr;
 	// index into the table with free small memory blocks
 	dword ix = *d;
 
@@ -952,7 +952,7 @@ void idHeap::SmallFree( void *ptr ) {
 		idLib::common->FatalError( "SmallFree: invalid memory block" );
 	}
 
-	*dt = (dword)smallFirstFree[ix];	// write next index
+	*dt = (uintptr_t)smallFirstFree[ix];	// write next index
 	smallFirstFree[ix] = (void *)d;		// link
 }
 
@@ -1320,8 +1320,8 @@ void *idHeap::LargeAllocate( dword bytes, byte tag ) {
 	}
 
 	byte *	d	= (byte*)(p->data) + ALIGN_SIZE( LARGE_HEADER_SIZE );
-	dword *	dw	= (dword*)(d - ALIGN_SIZE( LARGE_HEADER_SIZE ));
-	dw[0]		= (dword)p;				// write pointer back to page table
+	uintptr_t *	dw	= (uintptr_t*)(d - ALIGN_SIZE( LARGE_HEADER_SIZE ));
+	dw[0]		= (uintptr_t)p;				// write pointer back to page table
 //RAVEN BEGIN
 //amccarthy:  Added allocation tag
 #ifdef _DEBUG

@@ -8,6 +8,14 @@
 #include "BSE.h"
 #include "BSE_SpawnDomains.h"
 
+
+#ifdef __linux__
+#define __int16 int16_t
+#define __int8 int8_t
+#define LOWORD(l)       ((uint16_t)(((uint32_t)(l)) & 0xffff))
+#endif
+
+
 rvTrailInfo rvParticleTemplate::sTrailInfo;
 rvElectricityInfo rvParticleTemplate::sElectricityInfo;
 rvEnvParms rvParticleTemplate::sDefaultEnvelope;

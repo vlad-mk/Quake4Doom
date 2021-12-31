@@ -1,8 +1,7 @@
 
 
 
-
-#if defined( MACOS_X )
+#if defined( __linux__ ) || defined( MACOS_X )
 #include <signal.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -619,9 +618,7 @@ void AssertFailed( const char *file, int line, const char *expression ) {
 // jnewquist: Visual Studio platform independent breakpoint
 	__debugbreak();
 // RAVEN END
-#elif defined( __linux__ )
-	__asm__ __volatile__ ("int $0x03");
-#elif defined( MACOS_X )
+#elif defined( __linux__ ) || defined( MACOS_X )
 	kill( getpid(), SIGINT );
 #endif
 }

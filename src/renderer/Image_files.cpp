@@ -49,7 +49,7 @@ void R_LoadImage( const char *name, byte **pic, int *width, int *height, bool ma
  */
 
 extern "C" {
-#include "jpeg-6/jpeglib.h"
+#include <jpeglib.h>
 
 
 // hooks from jpeg lib to our system
@@ -417,6 +417,7 @@ static void LoadJPG( const char *filename, unsigned char **pic, int *width, int 
   unsigned char *out;
   byte	*fbuffer;
   byte  *bbuf;
+  int	len;
 
   /* In this example we want to open the input file before doing anything else,
    * so that the setjmp() error recovery below can assume the file is open.
@@ -430,7 +431,6 @@ static void LoadJPG( const char *filename, unsigned char **pic, int *width, int 
 	*pic = NULL;		// until proven otherwise
   }
   {
-		int		len;
 		idFile *f;
 
 		f = fileSystem->OpenFileRead( filename );
@@ -465,7 +465,11 @@ static void LoadJPG( const char *filename, unsigned char **pic, int *width, int 
 
   /* Step 2: specify data source (eg, a file) */
 
+  #if JPEG_LIB_VERSION >= 60
+  jpeg_mem_src(&cinfo, fbuffer, len);
+  #else
   jpeg_stdio_src(&cinfo, fbuffer);
+  #endif
 
   /* Step 3: read file parameters with jpeg_read_header() */
 
@@ -671,11 +675,11 @@ Loads six files with proper extensions
 */
 bool R_LoadCubeImages( const char *imgName, cubeFiles_t extensions, byte *pics[6], int *outSize, ID_TIME_T *timestamp ) {
 	int		i, j;
-	char	*cameraSides[6] =  { "_forward.tga", "_back.tga", "_left.tga", "_right.tga", 
+	const char	*cameraSides[6] =  { "_forward.tga", "_back.tga", "_left.tga", "_right.tga",
 		"_up.tga", "_down.tga" };
-	char	*axisSides[6] =  { "_px.tga", "_nx.tga", "_py.tga", "_ny.tga", 
+	const char	*axisSides[6] =  { "_px.tga", "_nx.tga", "_py.tga", "_ny.tga",
 		"_pz.tga", "_nz.tga" };
-	char	**sides;
+	const char	**sides;
 	char	fullName[MAX_IMAGE_NAME];
 	int		width, height, size = 0;
 

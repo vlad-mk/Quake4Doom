@@ -3,6 +3,63 @@ cmake_minimum_required(VERSION 3.10)
 # set the project name
 project(Quake4)
 
+option(USE_SYSTEM_LIBJPEG
+                "Use the system libjpeg instead of the bundled one" OFF)
+
+
+if(UNIX)
+    find_package(OpenAL REQUIRED)
+    include_directories(${OPENAL_INCLUDE_DIR})
+
+    set(OpenGL_GL_PREFERENCE LEGACY)
+    find_package(OpenGL REQUIRED)
+    include_directories(${OPENGL_INCLUDE_DIR})
+
+	find_package(GLEW REQUIRED)
+    include_directories(${GLEW_INCLUDE_DIRS})
+	set(GLEW_LIBRARY ${GLEW_LIBRARIES})
+
+	find_package(X11 REQUIRED)
+	set(X11_LIBRARY ${X11_LIBRARIES})
+
+    set(NVCtrlLib_FOUND false)
+    set(NVCtrlLib_INCLUDE_DIR)
+    set(NVCtrlLib_LIBRARY)
+
+    # search for libXNVCtrl.a
+    # typically in nvidia-settings-1.0/src/libXNVCtrl/libXNVCtrl.a
+    find_library(NVCtrlLib_LIBRARY XNVCtrl /usr/lib
+             DOC "Path to NVCONTROL static library (libXNVCtrl.a)")
+    find_path(NVCtrlLib_INCLUDE_DIR NVCtrlLib.h /usr/include/NVCtrl
+            DOC "Path to NVCONTROL headers (NVCtrlLib.h and NVCtrl.h)")
+
+    if(NVCtrlLib_LIBRARY AND NVCtrlLib_INCLUDE_DIR)
+        set(NVCtrlLib_FOUND true)
+    endif(NVCtrlLib_LIBRARY AND NVCtrlLib_INCLUDE_DIR)
+
+    include_directories(${NVCtrlLib_INCLUDE_DIR})
+
+    check_library_exists(Xxf86dga XDGAQueryExtension
+        "${X11_LIB_SEARCH_PATH}" XDGA_FOUND)
+
+    if(XDGA_FOUND)
+        add_compile_definitions(ID_ENABLE_DGA)
+        list(APPEND X11_LIBRARY Xxf86dga)
+    endif()
+
+endif()
+
+find_package(JPEG)
+
+if(JPEG_FOUND)
+    include_directories(${JPEG_INCLUDE_DIRS})
+else(JPEG_FOUND)
+    include_directories("erternal/jpeg-6")
+    set(JPEG_LIBRARIES)
+endif(JPEG_FOUND)
+
+
+
 set(Q4GAME
 	game/Actor.cpp 
 	game/Actor.h 
@@ -111,8 +168,8 @@ file(GLOB Q4GAME_WEAPON_INCLUDES game/weapon/*.h)
 file(GLOB Q4GAME_WEAPON_SOURCES game/weapon/*.cpp)
 
 # External 
-file(GLOB EXTERNAL_GLEW_INCLUDES external/glew/*.h)
-file(GLOB EXTERNAL_GLEW_SOURCES  external/glew/*.c)
+file(GLOB EXTERNAL_GLEW_INCLUDES external/glew/include/GL/*.h)
+file(GLOB EXTERNAL_GLEW_SOURCES  external/glew/src/*.c)
 
 # Quake 4 Game Coded Source Groups
 source_group("game-quake4" FILES Q4GAME)
@@ -166,12 +223,12 @@ file(GLOB ENGINE_IDLIB_THREADS_INCLUDES  idlib/threads/*.h)
 file(GLOB ENGINE_IDLIB_THREADS_SOURCES   idlib/threads/*.cpp)
 file(GLOB ENGINE_RENDERER_INCLUDES  renderer/*.h)
 file(GLOB ENGINE_RENDERER_SOURCES   renderer/*.cpp)
+
+
 file(GLOB ENGINE_RENDERER_COLOR_INCLUDES  renderer/color/*.h)
 file(GLOB ENGINE_RENDERER_COLOR_SOURCES   renderer/color/*.cpp)
-file(GLOB ENGINE_RENDERER_DXT_INCLUDES  renderer/DXT/*.h)
-file(GLOB ENGINE_RENDERER_DXT_SOURCES   renderer/DXT/*.cpp)
-file(GLOB ENGINE_RENDERER_JPEG_INCLUDES  renderer/jpeg-6/*.h)
-file(GLOB ENGINE_RENDERER_JPEG_SOURCES   renderer/jpeg-6/*.c)
+file(GLOB ENGINE_RENDERER_DXT_INCLUDES  renderer/dxt/*.h)
+file(GLOB ENGINE_RENDERER_DXT_SOURCES   renderer/dxt/*.cpp)
 file(GLOB ENGINE_RENDERER_OPENGL_INCLUDES  renderer/OpenGL/*.h)
 file(GLOB ENGINE_RENDERER_OPENGL_SOURCES   renderer/OpenGL/*.cpp)
 file(GLOB ENGINE_RENDERER_SOUND_INCLUDES  renderer/sound/*.h)
@@ -180,14 +237,40 @@ file(GLOB ENGINE_TOOLS_DMAP_INCLUDES  tools/compilers/dmap/*.h)
 file(GLOB ENGINE_TOOLS_DMAP_SOURCES   tools/compilers/dmap/*.cpp)
 file(GLOB ENGINE_SOUND_INCLUDES  sound/*.h)
 file(GLOB ENGINE_SOUND_SOURCES   sound/*.cpp)
-file(GLOB ENGINE_SOUND_OPENAL_INCLUDES  sound/openal/*.h)
-file(GLOB ENGINE_SOUND_OPENAL_SOURCES   sound/openal/*.cpp)
+file(GLOB ENGINE_SOUND_OPENAL_INCLUDES  sound/OpenAL/*.h)
+file(GLOB ENGINE_SOUND_OPENAL_SOURCES   sound/OpenAL/*.cpp)
 file(GLOB ENGINE_SYS_INCLUDES  sys/*.h)
 file(GLOB ENGINE_SYS_SOURCES   sys/*.cpp)
+
 file(GLOB ENGINE_SYS_WIN32_INCLUDES  sys/win32/*.h)
 file(GLOB ENGINE_SYS_WIN32_SOURCES   sys/win32/*.cpp)
+
+file(GLOB ENGINE_SYS_LINUX_INCLUDES  sys/posix/*.h sys/linux/*.h)
+file(GLOB ENGINE_SYS_LINUX_SOURCES  sys/posix/*.cpp sys/linux/*.cpp)
+
+
 file(GLOB ENGINE_UI_INCLUDES  ui/*.h)
 file(GLOB ENGINE_UI_SOURCES   ui/*.cpp)
+
+if (NOT JPEG_FOUND)
+    set(ENGINE_EXTERNAL_JPEG_INCLUDES external/jpeg-6/*.h)
+    set(ENGINE_EXTERNAL_JPEG_SOURCES external/jpeg-6/*.c)
+else(NOT JPEG_FOUND)
+    set(ENGINE_EXTERNAL_JPEG_INCLUDES)
+    set(ENGINE_EXTERNAL_JPEG_SOURCES)
+endif(NOT JPEG_FOUND)
+
+source_group("external\\jpeg-6" FILES ${JPEG_INCLUDES})
+source_group("external\\jpeg-6" FILES ${JPEG_SOURCES})
+
+source_group("external\\glew" FILES ${EXTERNAL_GLEW_INCLUDES})
+source_group("external\\glew" FILES ${EXTERNAL_GLEW_SOURCES})
+
+source_group("sys\\win32" FILES ${ENGINE_SYS_WIN32_INCLUDES})
+source_group("sys\\win32" FILES ${ENGINE_SYS_WIN32_SOURCES})
+
+source_group("sys\\linux" FILES ${ENGINE_SYS_LINUX_INCLUDES})
+source_group("sys\\linux" FILES ${ENGINE_SYS_LINUX_SOURCES})
 
 set(QUAKE4_SOURCES
 		${ENGINE_AAS_SOURCES}
@@ -206,17 +289,16 @@ set(QUAKE4_SOURCES
 		${ENGINE_RENDERER_SOURCES}
 		${ENGINE_RENDERER_COLOR_SOURCES}
 		${ENGINE_RENDERER_DXT_SOURCES}
-		${ENGINE_RENDERER_JPEG_SOURCES}
 		${ENGINE_RENDERER_OPENGL_SOURCES}
 		${ENGINE_RENDERER_SOUND_SOURCES}
 		${ENGINE_TOOLS_DMAP_SOURCES}
 		${ENGINE_SOUND_SOURCES}
 		${ENGINE_SOUND_OPENAL_SOURCES}
 		${ENGINE_SYS_SOURCES}
-		${ENGINE_SYS_WIN32_SOURCES}
-		${ENGINE_UI_SOURCES}
 
-		${EXTERNAL_GLEW_SOURCES}
+        ${ENGINE_EXTERNAL_JPEG_SOURCES}
+
+		${ENGINE_UI_SOURCES}
 
 		${Q4GAME}
 		${Q4GAME_AI_SOURCES}
@@ -233,6 +315,20 @@ set(QUAKE4_SOURCES
 	)
 
 
+if(MSVC)
+    list(APPEND QUAKE4_SOURCES
+        ${ENGINE_SYS_WIN32_SOURCES}
+		${EXTERNAL_GLEW_SOURCES}
+    )
+endif()
+
+if(UNIX)
+    list(APPEND QUAKE4_SOURCES
+        ${ENGINE_SYS_LINUX_SOURCES}
+    )
+endif()
+
+
 add_definitions(-DUSE_OPENAL)
 
 if(MSVC)
@@ -242,8 +338,30 @@ add_compile_options(-Wno-multichar)
 endif()
 
 # add the executable
+
 add_executable(Quake4 ${QUAKE4_SOURCES})
-target_precompile_headers(Quake4 PRIVATE idLib/precompiled.h)
-target_link_libraries(Quake4 opengl32.lib Dbghelp.lib Iphlpapi.lib dinput8.lib Winmm.lib dxguid.lib ws2_32.lib ${PROJECT_SOURCE_DIR}/external/openal-soft/lib/win64/openal32.lib)
+
+target_precompile_headers(Quake4 PRIVATE idlib/precompiled.h)
+target_include_directories(Quake4 PRIVATE "external")
+
+if(MSVC)
+    target_link_libraries(Quake4 opengl32.lib Dbghelp.lib Iphlpapi.lib dinput8.lib Winmm.lib dxguid.lib ws2_32.lib ${JPEG_LIBRARIES} ${PROJECT_SOURCE_DIR}/external/openal-soft/lib/win64/openal32.lib)
 target_include_directories(Quake4 PRIVATE "external/openal-soft/include")
 set_target_properties(Quake4 PROPERTIES OUTPUT_NAME "Quake4" LINK_FLAGS "/STACK:16777216,16777216 /SUBSYSTEM:WINDOWS /PDB:\"Quake4.pdb\"")
+
+else()
+    set(RT_LIBRARY rt)
+    target_link_libraries(Quake4
+                        ${OPENGL_LIBRARIES}
+                        ${JPEG_LIBRARIES}
+                        pthread
+                        ${RT_LIBRARY}
+                        ${OPENAL_LIBRARY}
+                        ${GLEW_LIBRARY}
+                        ${NVCtrlLib_LIBRARY}
+                        ${X11_Xxf86vm_LIB}
+                        ${X11_LIBRARY}
+                        ${CMAKE_DL_LIBS}
+                        )
+
+endif()

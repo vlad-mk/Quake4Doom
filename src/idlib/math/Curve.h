@@ -515,7 +515,7 @@ ID_INLINE type idCurve_Bezier<type>::GetCurrentValue( const float time ) const {
 
 	bvals = (float *) _alloca16( this->values.Num() * sizeof( float ) );
 
-	Basis( this->values.Num(), time, bvals );
+	this->Basis( this->values.Num(), time, bvals );
 	v = bvals[0] * this->values[0];
 	for ( i = 1; i < this->values.Num(); i++ ) {
 		v += bvals[i] * this->values[i];
@@ -2445,7 +2445,7 @@ ID_INLINE type idCurve_NURBS<type>::GetCurrentValue( const float time ) const {
 
 	clampedTime = idCurve_Spline<type>::ClampedTime( time );
 	i = idCurve<type>::IndexForTime( clampedTime );
-	Basis( i-1, this->order, clampedTime, bvals );
+	this->Basis( i-1, this->order, clampedTime, bvals );
 	v = this->values[0] - this->values[0];
 	w = 0.0f;
 	for ( j = 0; j < this->order; j++ ) {
@@ -2479,8 +2479,8 @@ ID_INLINE type idCurve_NURBS<type>::GetCurrentFirstDerivative( const float time 
 
 	clampedTime = idCurve_Spline<type>::ClampedTime( time );
 	i = idCurve<type>::IndexForTime( clampedTime );
-	Basis( i-1, this->order, clampedTime, bvals );
-	BasisFirstDerivative( i-1, this->order, clampedTime, d1vals );
+	this->Basis( i-1, this->order, clampedTime, bvals );
+	this->BasisFirstDerivative( i-1, this->order, clampedTime, d1vals );
 	vb = vd1 = this->values[0] - this->values[0];
 	wb = wd1 = 0.0f;
 	for ( j = 0; j < this->order; j++ ) {
@@ -2520,9 +2520,9 @@ ID_INLINE type idCurve_NURBS<type>::GetCurrentSecondDerivative( const float time
 
 	clampedTime = idCurve_Spline<type>::ClampedTime( time );
 	i = idCurve<type>::IndexForTime( clampedTime );
-	Basis( i-1, this->order, clampedTime, bvals );
-	BasisFirstDerivative( i-1, this->order, clampedTime, d1vals );
-	BasisSecondDerivative( i-1, this->order, clampedTime, d2vals );
+	this->Basis( i-1, this->order, clampedTime, bvals );
+	this->BasisFirstDerivative( i-1, this->order, clampedTime, d1vals );
+	this->BasisSecondDerivative( i-1, this->order, clampedTime, d2vals );
 	vb = vd1 = vd2 = this->values[0] - this->values[0];
 	wb = wd1 = wd2 = 0.0f;
 	for ( j = 0; j < this->order; j++ ) {

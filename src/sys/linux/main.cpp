@@ -35,6 +35,7 @@ If you have questions concerning this license or the applicable additional terms
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/time.h>
 #include <fcntl.h>
 
 #ifdef ID_MCHECK
@@ -177,8 +178,8 @@ const char *Sys_DefaultBasePath(void) {
 			common->Printf("no '%s' directory in cwd path %s, skipping\n", BASE_GAMEDIR, basepath.c_str());
 		}
 	}
-	common->Printf( "WARNING: using hardcoded default base path\n" );
-	return LINUX_DEFAULT_PATH;
+	common->Printf( "WARNING: using savepath path\n" );
+	return savepath.c_str();
 }
 
 /*
@@ -256,9 +257,20 @@ double Sys_GetClockTicks( void ) {
 						  "pop %%ebx\n"
 						  : "=r" (lo), "=r" (hi) );
 	return (double) lo + (double) 0xFFFFFFFF * hi;
+// RB begin
+#elif defined( __x86_64__ )
+        uint32_t lo, hi;
+        __asm__ __volatile__( "rdtsc" : "=a"( lo ), "=d"( hi ) );
+        return ( ( ( uint64_t )hi ) << 32 ) | lo;
 #else
-#error unsupported CPU
+        //#error unsupported CPU
+        struct timespec now;
+
+        clock_gettime( CLOCK_MONOTONIC, &now );
+
+        return now.tv_sec * 1000000000LL + now.tv_nsec;
 #endif
+// RB end
 }
 
 /*

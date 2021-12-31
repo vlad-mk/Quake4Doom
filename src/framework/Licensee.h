@@ -23,6 +23,8 @@
 #define GAME_BUILD_TYPE					""
 #elif defined(_RELEASE)
 #define	GAME_BUILD_TYPE					""
+#else
+#define	GAME_BUILD_TYPE					""
 #endif
 
 // paths

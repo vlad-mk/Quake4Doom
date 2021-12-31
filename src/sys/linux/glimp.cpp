@@ -35,7 +35,7 @@ If you have questions concerning this license or the applicable additional terms
 #include <unistd.h>
 
 extern "C" {
-#	include "libXNVCtrl/NVCtrlLib.h"
+#	include <NVCtrlLib.h>
 }
 
 idCVar sys_videoRam( "sys_videoRam", "0", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_INTEGER, "Texture memory on the video card (in megabytes) - 0: autodetect", 0, 512 );

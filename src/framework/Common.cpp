@@ -195,7 +195,7 @@ private:
 	idStrList					warningList;
 	idStrList					errorList;
 
-	INT_PTR						gameDLL;
+	intptr_t			    	gameDLL;
 
 	idLangDict					languageDict;
 

@@ -550,7 +550,6 @@ void idGameLocal::Init( void ) {
 // jmarshall
 	InitGameRenderSystem();
 // jmarshall end
-
 // jmarshall
 	// 	   
 	// load in the bot itemtable.
@@ -566,7 +565,6 @@ void idGameLocal::Init( void ) {
 	botWeaponInfoManager.Init();
 	botGoalManager.BotSetupGoalAI();
 // jmarshall end
-
 	Printf( "...%d aas types\n", aasList.Num() );
 	Printf( "game initialized.\n" );
 	Printf( "---------------------------------------------\n" );
@@ -699,6 +697,7 @@ void idGameLocal::Shutdown( void ) {
 	// shut down the animation manager
 // RAVEN BEGIN
 // jsinger: animationLib changed to a pointer
+	if(animationLib)
 	animationLib->Shutdown();
 // RAVEN END
 
@@ -2061,7 +2060,7 @@ bool idGameLocal::InitFromSaveGame( const char *mapName, idRenderWorld *renderWo
 		if ( !InhibitEntitySpawn( mapEnt->epairs ) ) {
 			CacheDictionaryMedia( &mapEnt->epairs );
 			const char *classname = mapEnt->epairs.GetString( "classname" );
-			if ( classname != '\0' ) {
+			if ( classname != NULL ) {
 				FindEntityDef( classname, false );
 			}
 		}
@@ -2679,7 +2678,7 @@ void idGameLocal::GetShakeSounds( const idDict *dict ) {
 	idStr soundName;
 
 	soundShaderName = dict->GetString( "s_shader" );
-	if ( soundShaderName != '\0' && dict->GetFloat( "s_shakes" ) != 0.0f ) {
+	if ( soundShaderName != NULL && dict->GetFloat( "s_shakes" ) != 0.0f ) {
 		soundShader = declManager->FindSound( soundShaderName );
 
 		for ( int i = 0; i < soundShader->GetNumSounds(); i++ ) {
@@ -8533,7 +8532,7 @@ int idGameLocal::TravelTimeToGoal( const idVec3& origin, const idVec3& goal )
 	if( aas == NULL )
 	{
 		gameLocal.Error( "idGameLocal::TraveTimeToGoal: No AAS loaded...\n" );
-		return NULL;
+		return 0;
 	}
 	//int originArea = aas->PointAreaNum(origin);
 	//idVec3 _goal = goal;
@@ -8547,7 +8546,7 @@ int idGameLocal::TravelTimeToGoal( const idVec3& origin, const idVec3& goal )
 	idReachability* reach;
 	if( !aas->RouteToGoalArea( curAreaNum, org, goalArea, TFL_WALK | TFL_AIR, travelTime, &reach ) )
 	{
-		return NULL;
+		return 0;
 	}
 
 	//int goalArea = aas->PointAreaNum(goal);
