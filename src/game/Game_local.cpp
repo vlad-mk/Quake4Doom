@@ -550,6 +550,7 @@ void idGameLocal::Init( void ) {
 // jmarshall
 	InitGameRenderSystem();
 // jmarshall end
+/* TODO: uncomment bots later
 // jmarshall
 	// 	   
 	// load in the bot itemtable.
@@ -565,6 +566,7 @@ void idGameLocal::Init( void ) {
 	botWeaponInfoManager.Init();
 	botGoalManager.BotSetupGoalAI();
 // jmarshall end
+*/
 	Printf( "...%d aas types\n", aasList.Num() );
 	Printf( "game initialized.\n" );
 	Printf( "---------------------------------------------\n" );

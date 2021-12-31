@@ -217,6 +217,8 @@ void Sys_XUninstallGrabs(void) {
 }
 
 void Sys_GrabMouseCursor( bool grabIt ) {
+//TODO: check mouse coursor
+return;
 #if defined( ID_DEDICATED )
 	return;
 #endif
