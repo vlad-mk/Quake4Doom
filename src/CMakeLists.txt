@@ -39,6 +39,14 @@ if(UNIX)
 
     include_directories(${NVCtrlLib_INCLUDE_DIR})
 
+    check_library_exists(Xxf86dga XDGAQueryExtension
+        "${X11_LIB_SEARCH_PATH}" XDGA_FOUND)
+
+    if(XDGA_FOUND)
+        add_compile_definitions(ID_ENABLE_DGA)
+        list(APPEND X11_LIBRARY Xxf86dga)
+    endif()
+
 endif()
 
 find_package(JPEG)
