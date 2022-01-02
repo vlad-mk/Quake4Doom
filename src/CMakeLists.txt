@@ -54,7 +54,7 @@ find_package(JPEG)
 if(JPEG_FOUND)
     include_directories(${JPEG_INCLUDE_DIRS})
 else(JPEG_FOUND)
-    include_directories("erternal/jpeg-6")
+    include_directories("external/jpeg-6")
     set(JPEG_LIBRARIES)
 endif(JPEG_FOUND)
 
